@@ -2,3 +2,4 @@ aiogram
 yt-dlp
 pyrogram
 tgcrypto
+python-dotenv
