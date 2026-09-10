@@ -5,7 +5,17 @@ from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command
 import yt_dlp
 
-TOKEN = "8791827254:AAE7TNX82Yb80sIKX1kG0WFkb..."
+# Optionally load .env file when python-dotenv is installed
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
+
+# Read token from environment variable to avoid committing secrets
+TOKEN = os.environ.get("BOT_TOKEN")
+if not TOKEN:
+    raise RuntimeError("Missing BOT_TOKEN environment variable. Set BOT_TOKEN before running the bot.")
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -34,10 +44,16 @@ async def download_video(message: types.Message):
         if os.path.exists(output_file):
             await message.answer_video(types.FSInputFile(output_file))
             os.remove(output_file)
-            await bot.delete_message(chat_id=message.chat.id, message_id=processing_msg.message_id)
+            try:
+                await bot.delete_message(chat_id=message.chat.id, message_id=processing_msg.message_id)
+            except Exception:
+                pass
         else:
             await message.answer("❌ ڤیدیۆکە نەدۆزرایەوە.")
-            await bot.delete_message(chat_id=message.chat.id, message_id=processing_msg.message_id)
+            try:
+                await bot.delete_message(chat_id=message.chat.id, message_id=processing_msg.message_id)
+            except Exception:
+                pass
     except Exception as e:
         await message.answer("❌ هەڵەیەک ڕوویدا.")
         try:
